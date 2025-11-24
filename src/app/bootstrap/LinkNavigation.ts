@@ -1,21 +1,28 @@
 /**
  * LinkNavigation.ts
- * Clean bootstrap-level navigation helpers for panel routing.
- * No JSX. No UI. Pure logic. Fully TS-safe.
+ * Pure TS navigation glue for PWA Factory Skeleton.
+ * No JSX. No UI. Provides the two exports expected by AppBootstrap.ts:
+ * - linkNavigation
+ * - NavigationLink
  */
 
-export type PanelTarget = 'left' | 'right' | 'none';
-export type PanelRule = 'open-left' | 'open-right' | 'close-all';
-
-export interface NavigationAction {
+export interface NavigationLink {
   path: string;
-  panel: PanelTarget;
+  panel: 'left' | 'right' | 'none';
 }
 
-/**
- * Determine which panel should open based on a route pattern.
- */
-export function resolvePanelRule(rule: PanelRule | undefined): PanelTarget {
+export interface NavigationOptions {
+  rule?: 'open-left' | 'open-right' | 'close-all';
+}
+
+export function linkNavigation(path: string, options?: NavigationOptions): NavigationLink {
+  return {
+    path,
+    panel: resolvePanelRule(options?.rule),
+  };
+}
+
+export function resolvePanelRule(rule?: NavigationOptions['rule']): 'left' | 'right' | 'none' {
   switch (rule) {
     case 'open-left':
       return 'left';
@@ -25,26 +32,4 @@ export function resolvePanelRule(rule: PanelRule | undefined): PanelTarget {
     default:
       return 'none';
   }
-}
-
-/**
- * Basic route navigation merger.
- * In a real app this will integrate with your router (React Router / TanStack).
- */
-export function navigateTo(
-  path: string,
-  rule?: PanelRule
-): NavigationAction {
-  return {
-    path,
-    panel: resolvePanelRule(rule),
-  };
-}
-
-/**
- * Returns true if the given path matches the current location.
- * Placeholder only — replace with router integration later.
- */
-export function isActive(current: string, target: string): boolean {
-  return current === target;
 }
