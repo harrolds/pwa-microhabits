@@ -1,1 +1,207 @@
-// Placeholder for PWA Factory Skeleton
+{
+  "schema": "pwa-factory.manifest/2.0",
+  "version": "2.0.0",
+  "generatedAt": "2025-11-24T10:00:00.000Z",
+  "compatibility": {
+    "navigation": "2.0.0",
+    "stateMachine": "2.0.0",
+    "minimumRuntime": "1.0.0"
+  },
+  "registry": {
+    "modules": [
+      {
+        "id": "factory.core.telemetry",
+        "name": "Telemetry Pipeline",
+        "summary": "Verzamelt runtime-signalen en levert heartbeat-data aan het shell.",
+        "version": "1.2.0",
+        "category": "core",
+        "entryPoint": "./runtime/telemetry.module.ts",
+        "activationMode": "boot",
+        "routes": ["factory.hub", "factory.runtime.modules.health"],
+        "widgets": ["factory.widgets.panel.telemetryDigest"],
+        "defaultConfig": {
+          "heartbeatIntervalMs": 15000,
+          "channels": ["uptime", "latency", "errors"]
+        }
+      },
+      {
+        "id": "factory.runtime.modules.registry",
+        "name": "Module Registry",
+        "summary": "Synchroniseert module builds en exposeert een generieke catalogus.",
+        "version": "1.4.3",
+        "category": "runtime",
+        "entryPoint": "./runtime/module-registry.module.ts",
+        "activationMode": "route",
+        "routes": ["factory.runtime.modules", "factory.runtime.modules.registry"],
+        "widgets": [
+          "factory.widgets.navigation.moduleCatalog",
+          "factory.widgets.panel.moduleDetail"
+        ],
+        "defaultConfig": {
+          "pollIntervalMs": 30000,
+          "allowEphemeral": true
+        }
+      },
+      {
+        "id": "factory.runtime.manifest.sync",
+        "name": "Manifest Sync",
+        "summary": "Beheert de handshake met Manifest System v2.0 en bewaakt diff status.",
+        "version": "2.0.1",
+        "category": "runtime",
+        "entryPoint": "./runtime/manifest-sync.module.ts",
+        "activationMode": "route",
+        "routes": ["factory.runtime.manifest", "factory.runtime.manifest.review"],
+        "widgets": ["factory.widgets.panel.manifestDiff"],
+        "defaultConfig": {
+          "autoResolve": false,
+          "maxDiffEntries": 200
+        }
+      },
+      {
+        "id": "factory.control.support.signals",
+        "name": "Support & Signals",
+        "summary": "Centraliseert incidentmeldingen en runtime alerts voor operators.",
+        "version": "1.0.5",
+        "category": "control",
+        "entryPoint": "./control/support-signals.module.ts",
+        "activationMode": "lazy",
+        "routes": ["factory.control.support"],
+        "widgets": ["factory.widgets.context.incidentFeed"],
+        "defaultConfig": {
+          "retentionMinutes": 240,
+          "maxIncidents": 25
+        }
+      }
+    ],
+    "widgets": [
+      {
+        "key": "factory.widgets.navigation.moduleCatalog",
+        "type": "navigation",
+        "moduleId": "factory.runtime.modules.registry",
+        "component": "ModuleCatalogNavigation",
+        "mountPoint": "navigation",
+        "routes": ["factory.runtime.modules", "factory.runtime.modules.registry"],
+        "description": "Toont de generieke modulecatalogus binnen de linker navigatiekolom."
+      },
+      {
+        "key": "factory.widgets.panel.moduleDetail",
+        "type": "panel",
+        "moduleId": "factory.runtime.modules.registry",
+        "component": "ModuleDetailPanel",
+        "mountPoint": "context",
+        "routes": ["factory.runtime.modules.registry"],
+        "description": "Contextpaneel met metadata, versies en status van de geselecteerde module."
+      },
+      {
+        "key": "factory.widgets.panel.telemetryDigest",
+        "type": "panel",
+        "moduleId": "factory.core.telemetry",
+        "component": "TelemetryDigestPanel",
+        "mountPoint": "panel",
+        "routes": ["factory.hub", "factory.runtime.modules.health"],
+        "description": "Realtime overzicht van kernmetrics voor de operator shell."
+      },
+      {
+        "key": "factory.widgets.panel.manifestDiff",
+        "type": "panel",
+        "moduleId": "factory.runtime.manifest.sync",
+        "component": "ManifestDiffPanel",
+        "mountPoint": "manifest",
+        "routes": ["factory.runtime.manifest", "factory.runtime.manifest.review"],
+        "description": "Visualiseert wijzigingen uit Manifest System v2.0 en begeleidt apply-flow."
+      },
+      {
+        "key": "factory.widgets.context.incidentFeed",
+        "type": "context",
+        "moduleId": "factory.control.support.signals",
+        "component": "IncidentFeedWidget",
+        "mountPoint": "context",
+        "routes": ["factory.control.support"],
+        "description": "Contextuele feed met alerts, escalaties en contactopties."
+      }
+    ]
+  },
+  "integration": {
+    "routes": [
+      {
+        "routeId": "factory.hub",
+        "modules": ["factory.core.telemetry"],
+        "widgets": ["factory.widgets.panel.telemetryDigest"],
+        "autoActivate": true
+      },
+      {
+        "routeId": "factory.runtime.modules",
+        "modules": ["factory.runtime.modules.registry"],
+        "widgets": [
+          "factory.widgets.navigation.moduleCatalog",
+          "factory.widgets.panel.moduleDetail"
+        ],
+        "autoActivate": true
+      },
+      {
+        "routeId": "factory.runtime.modules.registry",
+        "modules": ["factory.runtime.modules.registry"],
+        "widgets": ["factory.widgets.panel.moduleDetail"]
+      },
+      {
+        "routeId": "factory.runtime.modules.health",
+        "modules": ["factory.core.telemetry"],
+        "widgets": ["factory.widgets.panel.telemetryDigest"]
+      },
+      {
+        "routeId": "factory.runtime.manifest",
+        "modules": ["factory.runtime.manifest.sync"],
+        "widgets": ["factory.widgets.panel.manifestDiff"],
+        "fallbackWidgets": ["factory.widgets.panel.moduleDetail"]
+      },
+      {
+        "routeId": "factory.runtime.manifest.review",
+        "modules": ["factory.runtime.manifest.sync"],
+        "widgets": ["factory.widgets.panel.manifestDiff"],
+        "autoActivate": true
+      },
+      {
+        "routeId": "factory.control.support",
+        "modules": ["factory.control.support.signals"],
+        "widgets": ["factory.widgets.context.incidentFeed"]
+      }
+    ],
+    "navigation": {
+      "version": "2.0.0",
+      "navigation": {
+        "extends": [
+          {
+            "id": "factory.runtime.manifest.review",
+            "label": "Review & Apply",
+            "summary": "Controleer en bevestig wijzigingen uit Manifest System v2.0.",
+            "path": "/manifest/review",
+            "parentId": "factory.runtime.manifest",
+            "panelRules": [
+              {
+                "target": "right",
+                "behavior": "contextual",
+                "mode": "overlay",
+                "defaultState": "open",
+                "label": "Manifest diff",
+                "payloadSlot": "manifest"
+              }
+            ]
+          },
+          {
+            "id": "factory.control.support",
+            "panelRules": [
+              {
+                "target": "right",
+                "behavior": "contextual",
+                "mode": "overlay",
+                "defaultState": "closed",
+                "label": "Signal feed",
+                "payloadSlot": "context"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}
