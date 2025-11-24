@@ -1,0 +1,322 @@
+{
+  "files": [
+    {
+      "path": "index.html",
+      "size": 50,
+      "firstLines": "// Placeholder for PWA Factory Skeleton\n",
+      "fileType": "html"
+    },
+    {
+      "path": "main.tsx",
+      "size": 2500,
+      "firstLines": "import React, { useCallback, useEffect, useSyncExternalStore } from 'react';\nimport ReactDOM from 'react-dom/client';\nimport { AppBootstrap, type AppBootstrapContext } from './src/app/bootstrap/AppBootstrap';\nimport ShellRoot from './src/app/Shell/ShellRoot';\nimport type { StateMachine } from './src/app/StateMachine/dispatch';\nimport type { PWAFactoryState } from './src/app/StateMachine/globalState';\nimport { selectCurrentRoute, selectLifecycle } from './src/app/StateMachine/selectors';\nimport { FALLBACK_ROUTE_ID } from './src/app/Navigation/routes';\nimport { WidgetRegistryProvider, WidgetStage } from './src/app/Widgets/WidgetRegistry';\nimport { NavigationBlueprintPanel } from './src/app/bootstrap/LinkNavigation';\n\nconst bootstrap = new AppBootstrap();\n\nconst useStateMachineSelector = <T,>(\n  stateMachine: StateMachine,\n  selector: (state: PWAFactoryState) => T,\n): T => {\n  const subscribe = useCallback(\n    (onStoreChange: () => void) =>\n      stateMachine.subscribe(() => {\n        onStoreChange();\n      }),\n    [stateMachine],\n  );\n\n  const getSnapshot = useCallback(() => selector(stateMachine.getState()), [selector, stateMachine]);\n\n  return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);\n};\n\nconst RuntimeViewport: React.FC<{ context: AppBootstrapContext }> = ({ context }) => {\n  const lifecycle = useStateMachineSelector(context.stateMachine, selectLifecycle);\n  const currentRoute = useStateMachineSelector(context.stateMachine, selectCurrentRoute) ?? FALLBACK_ROUTE_ID;",
+      "fileType": "tsx"
+    },
+    {
+      "path": "package.json",
+      "size": 50,
+      "firstLines": "// Placeholder for PWA Factory Skeleton\n",
+      "fileType": "json"
+    },
+    {
+      "path": "vite.config.ts",
+      "size": 700,
+      "firstLines": "import { defineConfig } from 'vite';\nimport react from '@vitejs/plugin-react';\nimport { resolve } from 'node:path';\n\nconst buildTimestamp = new Date().toISOString();\n\nexport default defineConfig({\n  plugins: [react()],\n  define: {\n    __PWA_BUILD_TIME__: JSON.stringify(buildTimestamp),\n  },\n  build: {\n    rollupOptions: {\n      input: {\n        main: resolve(__dirname, 'index.html'),\n      },\n    },\n    outDir: 'dist',\n    sourcemap: true,\n  },\n  server: {\n    open: false,\n  },\n});\n",
+      "fileType": "ts"
+    },
+    {
+      "path": "netlify.toml",
+      "size": 650,
+      "firstLines": "[build]\ncommand = \"npm run build\"\npublish = \"dist\"\n\n[functions]\ndirectory = \"netlify/functions\"\nnode_bundler = \"esbuild\"\nincluded_files = []\n\n[[redirects]]\nfrom = \"/api/*\"\nto = \"/.netlify/functions/:splat\"\nstatus = 200\n\n[[redirects]]\nfrom = \"/proxy/*\"\nto = \"/.netlify/functions/proxy\"\nstatus = 200\nforce = true\n\n[[redirects]]\nfrom = \"/*\"\nto = \"/index.html\"\nstatus = 200\n",
+      "fileType": "toml"
+    },
+    {
+      "path": "public/manifest.json",
+      "size": 1200,
+      "firstLines": "{\n  \"id\": \"/\",\n  \"name\": \"PWA Factory Skeleton\",\n  \"short_name\": \"PWA Factory\",\n  \"description\": \"Factory-default baseline that keeps the Microhabits shell PWA-ready.\",\n  \"start_url\": \"/\",\n  \"scope\": \"/\",\n  \"display\": \"standalone\",\n  \"orientation\": \"any\",\n  \"background_color\": \"#05060a\",\n  \"theme_color\": \"#0f6ffc\",\n  \"lang\": \"en\",\n  \"categories\": [\"productivity\", \"utilities\"],\n  \"icons\": [\n    {\n      \"src\": \"/icons/icon-192.png\",\n      \"sizes\": \"192x192\",\n      \"type\": \"image/png\"\n    },\n    {\n      \"src\": \"/icons/icon-512.png\",\n      \"sizes\": \"512x512\",\n      \"type\": \"image/png\"\n    },\n    {\n      \"src\": \"/icons/maskable-192.png\",\n      \"sizes\": \"192x192\",\n      \"type\": \"image/png\",\n      \"purpose\": \"maskable\"\n    },\n    {\n      \"src\": \"/icons/maskable-512.png\",\n      \"sizes\": \"512x512\",\n      \"type\": \"image/png\",\n      \"purpose\": \"maskable\"\n    }",
+      "fileType": "json"
+    },
+    {
+      "path": "public/offline.html",
+      "size": 2000,
+      "firstLines": "<!doctype html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <title>Offline • PWA Factory Skeleton</title>\n    <style>\n      :root {\n        color-scheme: dark;\n        font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;\n        background-color: #05060a;\n        color: #f4f6fb;\n      }\n      body {\n        min-height: 100vh;\n        display: flex;\n        align-items: center;\n        justify-content: center;\n        margin: 0;\n        padding: 2rem;\n      }\n      main {\n        text-align: center;\n        max-width: 28rem;\n        padding: 2rem;\n        border: 1px solid rgba(255, 255, 255, 0.08);\n        border-radius: 1.25rem;\n        background: radial-gradient(circle at top, rgba(15, 111, 252, 0.12), transparent);\n      }",
+      "fileType": "html"
+    },
+    {
+      "path": "public/service-worker.js",
+      "size": 3800,
+      "firstLines": "'use strict';\n\nconst versionTag = (() => {\n  try {\n    const swUrl = new URL(self.location.href);\n    return (swUrl.searchParams.get('v') || 'dev').replace(/[^0-9a-zA-Z_-]/g, '');\n  } catch {\n    return 'dev';\n  }\n})();\nconst SHELL_CACHE = `pwa-shell-${versionTag}`;\nconst MODULE_CACHE = `pwa-modules-${versionTag}`;\nconst OFFLINE_URL = '/offline.html';\nconst PRECACHE = ['/', '/index.html', OFFLINE_URL, '/manifest.json'];\nconst MODULE_ROUTE_HINTS = [/\\/modules\\//, /module-manifest\\.json$/];\nconst SHELL_ASSET_EXT = /\\.(?:css|js|mjs|cjs|ts|tsx|jsx|json|ico|png|svg|webp|jpg|jpeg|gif|woff2?)$/i;\n\nself.addEventListener('install', (event) => {\n  self.skipWaiting();\n  event.waitUntil(\n    caches\n      .open(SHELL_CACHE)\n      .then((cache) => cache.addAll(PRECACHE))\n      .catch((error) => {\n        console.error('[PWA] Failed to precache shell', error);\n      }),\n  );\n});",
+      "fileType": "js"
+    },
+    {
+      "path": "public/icons/icon-192.png",
+      "size": 0,
+      "binary": true,
+      "fileType": "png"
+    },
+    {
+      "path": "public/icons/icon-512.png",
+      "size": 0,
+      "binary": true,
+      "fileType": "png"
+    },
+    {
+      "path": "public/icons/maskable-192.png",
+      "size": 0,
+      "binary": true,
+      "fileType": "png"
+    },
+    {
+      "path": "public/icons/maskable-512.png",
+      "size": 0,
+      "binary": true,
+      "fileType": "png"
+    },
+    {
+      "path": "netlify/functions/ai-handler.js",
+      "size": 1800,
+      "firstLines": "const corsHeaders = (extra = {}) =>\n  new Headers({\n    'Access-Control-Allow-Origin': '*',\n    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',\n    'Access-Control-Allow-Methods': 'POST, OPTIONS',\n    'Content-Type': 'application/json; charset=utf-8',\n    ...extra,\n  });\n\nconst jsonResponse = (status, payload = {}, headers = {}) =>\n  new Response(JSON.stringify(payload), { status, headers: corsHeaders(headers) });\n\nconst ensureJsonBody = async (request) => {\n  try {\n    return await request.json();\n  } catch {\n    throw new Error('INVALID_JSON');\n  }\n};\n\nexport default async function handler(request, context) {\n  if (request.method === 'OPTIONS') {\n    return new Response(null, { status: 204, headers: corsHeaders() });\n  }\n\n  if (request.method !== 'POST') {\n    return jsonResponse(405, { error: 'Method Not Allowed' });\n  }\n\n  let body;\n  try {\n    body = await ensureJsonBody(request);\n  } catch (error) {\n    const details = error.message === 'INVALID_JSON' ? 'Invalid JSON payload' : 'Unexpected error';\n    return jsonResponse(400, { error: details });\n  }",
+      "fileType": "js"
+    },
+    {
+      "path": "netlify/functions/error-fallback.js",
+      "size": 800,
+      "firstLines": "const corsHeaders = (extra = {}) =>\n  new Headers({\n    'Access-Control-Allow-Origin': '*',\n    'Access-Control-Allow-Headers': 'Content-Type',\n    'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',\n    'Content-Type': 'application/json; charset=utf-8',\n    ...extra,\n  });\n\nconst jsonResponse = (status, payload = {}) =>\n  new Response(JSON.stringify(payload), { status, headers: corsHeaders() });\n\nexport default async function handler(request, context) {\n  if (request.method === 'OPTIONS') {\n    return new Response(null, { status: 204, headers: corsHeaders() });\n  }\n\n  return jsonResponse(500, {\n    status: 'error',\n    message: 'A non-recoverable error occurred. Please retry or inspect logs.',\n    traceId: context?.requestId ?? globalThis.crypto?.randomUUID?.() ?? 'unknown',\n    timestamp: new Date().toISOString(),\n  });\n}",
+      "fileType": "js"
+    },
+    {
+      "path": "netlify/functions/health.js",
+      "size": 750,
+      "firstLines": "const corsHeaders = (extra = {}) =>\n  new Headers({\n    'Access-Control-Allow-Origin': '*',\n    'Access-Control-Allow-Methods': 'GET, OPTIONS',\n    'Access-Control-Allow-Headers': 'Content-Type',\n    'Content-Type': 'application/json; charset=utf-8',\n    ...extra,\n  });\n\nconst jsonResponse = (status, payload) =>\n  new Response(JSON.stringify(payload), { status, headers: corsHeaders() });\n\nexport default async function handler(request, context) {\n  if (request.method === 'OPTIONS') {\n    return new Response(null, { status: 204, headers: corsHeaders() });\n  }\n\n  if (request.method !== 'GET') {\n    return jsonResponse(405, { error: 'Method Not Allowed' });\n  }\n\n  return jsonResponse(200, {\n    status: 'ok',\n    uptime: process.uptime(),\n    timestamp: new Date().toISOString(),\n    region: context?.geo?.city ?? 'unknown',\n  });\n}",
+      "fileType": "js"
+    },
+    {
+      "path": "netlify/functions/proxy.js",
+      "size": 3200,
+      "firstLines": "const corsHeaders = (extra = {}) =>\n  new Headers({\n    'Access-Control-Allow-Origin': '*',\n    'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',\n    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',\n    'Content-Type': 'application/json; charset=utf-8',\n    ...extra,\n  });\n\nconst allowedMethods = new Set(['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']);\n\nconst jsonResponse = (status, payload = {}) =>\n  new Response(JSON.stringify(payload), { status, headers: corsHeaders() });\n\nconst sanitizePath = (path = '/') => {\n  if (!path.startsWith('/')) {\n    return `/${path}`;\n  }\n  if (path.includes('..')) {\n    throw new Error('INVALID_PATH');\n  }\n  return path;\n};\n\nconst forwardHeaders = (request) => {\n  const sanitized = new Headers();\n  const allowedHeaderNames = ['authorization', 'content-type', 'if-none-match'];\n  request.headers.forEach((value, key) => {\n    if (allowedHeaderNames.includes(key.toLowerCase())) {\n      sanitized.set(key, value);\n    }\n  });\n  return sanitized;\n};",
+      "fileType": "js"
+    },
+    {
+      "path": "src/ai/index.ts",
+      "size": 2800,
+      "firstLines": "import { preprocessInput, type PreprocessFn, type PreprocessRequest } from './pipeline/preprocess';\nimport { redactSensitiveData, type RedactionFn, type RedactionResult } from './pipeline/redact';\nimport {\n  routeRequest,\n  type RouteFn,\n  type RouteResult,\n  type RouterConfig,\n  type RouterPayload,\n} from './pipeline/route';\nimport { postprocessResponse, type PostprocessFn, type PostprocessResult } from './pipeline/postprocess';\n\nexport interface AIRequest extends PreprocessRequest {\n  expectations?: RouterPayload['expectations'];\n}\n\nexport interface AIResponse extends PostprocessResult {\n  meta: {\n    preprocess: ReturnType<PreprocessFn>;\n    redaction: RedactionResult;\n    route: RouteResult;\n  };\n}\n\nexport interface AIRuntime {\n  preprocess?: PreprocessFn;\n  redact?: RedactionFn;\n  route?: RouteFn;\n  postprocess?: PostprocessFn;\n  routerConfig?: RouterConfig;\n}",
+      "fileType": "ts"
+    },
+    {
+      "path": "src/ai/pipeline/preprocess.ts",
+      "size": 1900,
+      "firstLines": "export interface PreprocessRequest {\n  input: string;\n  metadata?: Record<string, unknown>;\n}\n\nexport interface PreprocessResult {\n  normalized: string;\n  tokens: string[];\n  warnings: string[];\n  isSafe: boolean;\n}\n\nconst UNSUPPORTED_CHARS = /[\\u0000-\\u001f\\u007f]/g;\nconst MULTI_WHITESPACE = /\\s+/g;\nconst HTML_TAGS = /<script[\\s\\S]*?>[\\s\\S]*?<\\/script>|<style[\\s\\S]*?>[\\s\\S]*?<\\/style>/gi;\n\nconst SAFETY_KEYWORDS = [\n  'malware',\n  'exploit',\n  'dox',\n  'weapon',\n  'sudo rm',\n  'sqlmap',\n];\n\nconst TOKEN_BOUNDARY = /\\b/;\n\nexport const preprocessInput = (request: PreprocessRequest): PreprocessResult => {\n  const warnings: string[] = [];\n  const base = request.input ?? '';\n\n  const stripped = base.replace(HTML_TAGS, ' ').replace(UNSUPPORTED_CHARS, ' ');\n  const normalized = stripped.replace(MULTI_WHITESPACE, ' ').trim();\n  if (!normalized.length) {\n    warnings.push('input_empty_after_normalization');\n  }",
+      "fileType": "ts"
+    },
+    {
+      "path": "src/ai/pipeline/postprocess.ts",
+      "size": 1600,
+      "firstLines": "import type { RouteResult } from './route';\n\nexport interface PostprocessResult {\n  output: string;\n  blocked: boolean;\n  notes: string[];\n  driver: string;\n}\n\nconst DISALLOWED_SNIPPETS = ['<script', '{%'];\n\nconst sanitizeOutput = (value: string): string =>\n  value.replace(/\\s+/g, ' ').replace(/[^\\x09\\x0a\\x0d\\x20-\\x7e]/g, '').trim();\n\nexport const postprocessResponse = (result: RouteResult): PostprocessResult => {\n  const notes: string[] = [];\n  const sanitized = sanitizeOutput(result.response);\n\n  if (sanitized !== result.response) {\n    notes.push('output_normalized');\n  }\n\n  const blocked = DISALLOWED_SNIPPETS.some((snippet) =>\n    sanitized.toLowerCase().includes(snippet.toLowerCase()),\n  );\n  if (blocked) {\n    notes.push('blocked_for_html_like_content');\n  }",
+      "fileType": "ts"
+    },
+    {
+      "path": "src/ai/pipeline/redact.ts",
+      "size": 2200,
+      "firstLines": "import type { PreprocessResult } from './preprocess';\n\nexport interface RedactionResult extends PreprocessResult {\n  redacted: string;\n  redactionSummary: Record<string, number>;\n}\n\ntype RedactionPattern = {\n  label: string;\n  pattern: RegExp;\n  token: string;\n};\n\nconst PATTERNS: RedactionPattern[] = [\n  {\n    label: 'email',\n    pattern: /\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\\b/gi,\n    token: '[REDACTED_EMAIL]',\n  },\n  {\n    label: 'phone',\n    pattern: /\\+?\\d[\\d\\s().-]{7,}\\d/g,\n    token: '[REDACTED_PHONE]',\n  },\n  {\n    label: 'address',\n    pattern: /\\b\\d{1,5}\\s+[A-Z][A-Z\\s]+\\b/gi,\n    token: '[REDACTED_ADDRESS]',\n  },\n  {\n    label: 'number',\n    pattern: /\\b\\d{4,}\\b/g,\n    token: '[REDACTED_NUMBER]',\n  },\n  {\n    label: 'id',\n    pattern: /\\b[A-Z0-9]{3,}-[A-Z0-9-]{3,}\\b/gi,\n    token: '[REDACTED_ID]',\n  },\n];",
+      "fileType": "ts"
+    },
+    {
+      "path": "src/ai/pipeline/route.ts",
+      "size": 3100,
+      "firstLines": "import type { RedactionResult } from './redact';\n\nexport interface RouterConfig {\n  drivers: LLMDriver[];\n  fallbackDriver?: LLMDriver;\n}\n\nexport interface RouterPayload extends RedactionResult {\n  expectations?: {\n    maxTokens?: number;\n    temperature?: number;\n  };\n}\n\nexport interface RouteResult {\n  driver: string;\n  response: string;\n  elapsedMs: number;\n  metadata: Record<string, unknown>;\n}\n\nexport interface LLMDriver {\n  name: string;\n  supports: (payload: RouterPayload) => boolean;\n  invoke: (payload: RouterPayload) => Promise<string>;\n}\n\nclass DeterministicLLMStub implements LLMDriver {\n  name = 'deterministic-stub';\n\n  supports(): boolean {\n    return true;\n  }\n\n  async invoke(payload: RouterPayload): Promise<string> {\n    return `[STUB:${this.name}] ${payload.redacted}`;\n  }\n}",
+      "fileType": "ts"
+    },
+    {
+      "path": "src/app/bootstrap/AppBootstrap.ts",
+      "size": 2400,
+      "firstLines": "import type { ShellControllers } from '../Shell/ShellRoot';\nimport type { ModuleLoader } from '../Modules/ModuleLoader';\nimport type { StateMachine } from '../StateMachine/dispatch';\nimport type { WidgetLoader } from './RegisterLoaders';\nimport { registerLoaders } from './RegisterLoaders';\nimport { initializeStateMachine } from './InitializeStateMachine';\nimport { linkNavigation, type NavigationLink } from './LinkNavigation';\n\nexport interface AppBootstrapContext {\n  stateMachine: StateMachine;\n  moduleLoader: ModuleLoader;\n  widgetLoader: WidgetLoader;\n  navigationLink: NavigationLink;\n}\n\nexport class AppBootstrap {\n  private contextPromise: Promise<AppBootstrapContext> | null = null;\n  private context: AppBootstrapContext | null = null;\n  private shell: ShellControllers | null = null;\n  private attachLoaderShell?: (controllers: ShellControllers) => void;\n\n  async start(): Promise<AppBootstrapContext> {\n    if (this.context) {\n      return this.context;\n    }\n    if (this.contextPromise) {\n      return this.contextPromise;\n    }",
+      "fileType": "ts"
+    },
+    {
+      "path": "src/app/bootstrap/InitializeStateMachine.ts",
+      "size": 1200,
+      "firstLines": "import type { PWAFactoryState } from '../StateMachine/globalState';\nimport { createStateMachine, type StateMachine } from '../StateMachine/dispatch';\n\nexport interface InitializeStateMachineResult {\n  stateMachine: StateMachine;\n}\n\nexport let globalState: PWAFactoryState;\n\ntype GlobalStateListener = (next: PWAFactoryState) => void;\n\nconst listeners = new Set<GlobalStateListener>();\n\nconst updateGlobalState = (next: PWAFactoryState) => {\n  globalState = next;\n  listeners.forEach((listener) => listener(next));\n};\n\nexport const initializeStateMachine = (): InitializeStateMachineResult => {\n  const stateMachine = createStateMachine();\n  updateGlobalState(stateMachine.getState());\n\n  stateMachine.subscribe((state) => {\n    updateGlobalState(state);\n  });\n\n  console.info('[StateMachine v2.0] initialized');\n\n  return { stateMachine };\n};",
+      "fileType": "ts"
+    },
+    {
+      "path": "src/app/bootstrap/LinkNavigation.ts",
+      "size": 6800,
+      "firstLines": "import React, { useEffect, useMemo, useState } from 'react';\nimport type { ShellControllers } from '../Shell/ShellRoot';\nimport { buildNavigationMap, type ManifestNavigationSpecV2, type NavigationNode } from '../Navigation/NavigationMap';\nimport { createRouteResolver, type RouteMatch } from '../Navigation/RouteResolver';\nimport type { PanelRule, RouteId } from '../Navigation/routes';\nimport { FALLBACK_ROUTE_ID } from '../Navigation/routes';\nimport type { StateMachine } from '../StateMachine/dispatch';\n\nexport interface LinkNavigationOptions {\n  stateMachine: StateMachine;\n  manifest?: ManifestNavigationSpecV2 | null;\n  initialRoute?: RouteId | string;\n}\n\nexport interface NavigationLink {\n  map: NavigationNode[];\n  navigate: (target: RouteId | string, options?: { replace?: boolean; silent?: boolean }) => RouteMatch;\n  getActiveRoute: () => RouteId;\n  subscribe: (listener: (routeId: RouteId) => void) => () => void;\n  attachShell: (controllers: ShellControllers) => void;\n  dispose: () => void;\n}\n\nconst normalizePanelRules = (rules?: PanelRule[]) => {\n  if (!rules?.length) {\n    return {};\n  }\n  return {\n    left: rules.find((rule) => rule.target === 'left'),\n    right: rules.find((rule) => rule.target === 'right'),\n  };\n};",
+      "fileType": "ts"
+    },
+    {
+      "path": "src/app/bootstrap/RegisterLoaders.ts",
+      "size": 3900,
+      "firstLines": "import type { ShellControllers } from '../Shell/ShellRoot';\nimport type { ModuleLoader } from '../Modules/ModuleLoader';\nimport { createModuleLoader } from '../Modules/ModuleLoader';\nimport type { StateMachine } from '../StateMachine/dispatch';\nimport type { RouteId } from '../Navigation/routes';\n\ntype WidgetModuleShape = Record<string, unknown>;\n\nconst widgetSources = import.meta.glob('../Widgets/runtime/**/*.widget.{ts,tsx}');\n\nexport interface WidgetLoader {\n  load: (componentName: string) => Promise<WidgetModuleShape>;\n  preload: (componentNames: string[]) => Promise<void>;\n}\n\nconst normalizeComponentName = (componentName: string) => componentName.replace(/\\.(tsx|ts)$/, '');\n\nconst createWidgetLoader = (stateMachine: StateMachine): WidgetLoader => {\n  const resolveSource = (componentName: string) => {\n    const normalized = normalizeComponentName(componentName);\n    const entry = Object.entries(widgetSources).find(([path]) =>\n      path.endsWith(`${normalized}.widget.tsx`) || path.endsWith(`${normalized}.widget.ts`),\n    );\n    return entry?.[1];\n  };",
+      "fileType": "ts"
+    },
+    {
+      "path": "src/app/Home/HomePage.tsx",
+      "size": 5500,
+      "firstLines": "import React, { useCallback, useEffect, useMemo, useSyncExternalStore } from 'react';\nimport ShellRoot from '../Shell/ShellRoot';\nimport type { StateMachine } from '../StateMachine/dispatch';\nimport { createStateMachine } from '../StateMachine/dispatch';\nimport { selectCurrentRoute, selectLifecycle } from '../StateMachine/selectors';\nimport type { AppLifecyclePhase, PWAFactoryState } from '../StateMachine/globalState';\nimport { createModuleLoader } from '../Modules/ModuleLoader';\nimport type { RouteBindingDescriptor } from '../Modules/ModuleLoader';\nimport type { RouteId } from '../Navigation/routes';\nimport { FALLBACK_ROUTE_ID } from '../Navigation/routes';\nimport {\n  WidgetRegistryProvider,\n  WidgetStage,\n  useWidgetRegistry,\n} from '../Widgets/WidgetRegistry';\n\nconst useBootstrapLifecycle = (stateMachine: StateMachine) => {\n  useEffect(() => {\n    const state = stateMachine.getState();\n\n    if (state.lifecycle.phase === 'booting') {\n      void stateMachine.dispatch({\n        type: 'LIFECYCLE/SET_PHASE',\n        payload: { phase: 'ready' },\n      });\n    }",
+      "fileType": "tsx"
+    },
+    {
+      "path": "src/app/Modules/module-manifest.json",
+      "size": 6800,
+      "firstLines": "{\n  \"schema\": \"pwa-factory.manifest/2.0\",\n  \"version\": \"2.0.0\",\n  \"generatedAt\": \"2025-11-24T10:00:00.000Z\",\n  \"compatibility\": {\n    \"navigation\": \"2.0.0\",\n    \"stateMachine\": \"2.0.0\",\n    \"minimumRuntime\": \"1.0.0\"\n  },\n  \"registry\": {\n    \"modules\": [\n      {\n        \"id\": \"factory.core.telemetry\",\n        \"name\": \"Telemetry Pipeline\",\n        \"summary\": \"Verzamelt runtime-signalen en levert heartbeat-data aan het shell.\",\n        \"version\": \"1.2.0\",\n        \"category\": \"core\",\n        \"entryPoint\": \"./runtime/telemetry.module.ts\",\n        \"activationMode\": \"boot\",\n        \"routes\": [\"factory.hub\", \"factory.runtime.modules.health\"],\n        \"widgets\": [\"factory.widgets.panel.telemetryDigest\"],\n        \"defaultConfig\": {\n          \"heartbeatIntervalMs\": 15000,\n          \"channels\": [\"uptime\", \"latency\", \"errors\"]\n        }\n      },\n      {\n        \"id\": \"factory.runtime.modules.registry\",\n        \"name\": \"Module Registry\",\n        \"summary\": \"Synchroniseert module builds en exposeert een generieke catalogus.\",\n        \"version\": \"1.4.3\",\n        \"category\": \"runtime\",\n        \"entryPoint\": \"./runtime/module-registry.module.ts\",\n        \"activationMode\": \"route\",\n        \"routes\": [\"factory.runtime.modules\", \"factory.runtime.modules.registry\"],\n        \"widgets\": [\n          \"factory.widgets.navigation.moduleCatalog\",\n          \"factory.widgets.panel.moduleDetail\"\n        ],\n        \"defaultConfig\": {\n          \"pollIntervalMs\": 30000,\n          \"allowEphemeral\": true\n        }\n      }",
+      "fileType": "json"
+    },
+    {
+      "path": "src/app/Modules/ModuleLoader.ts",
+      "size": 8800,
+      "firstLines": "import manifestJson from './module-manifest.json';\nimport type { ManifestNavigationSpecV2 } from '../Navigation/NavigationMap';\nimport type { RouteId } from '../Navigation/routes';\nimport type { StateMachine } from '../StateMachine/dispatch';\n\nexport type ModuleId = `factory.${string}`;\nexport type WidgetKey = `factory.widgets.${string}`;\nexport type ModuleCategory = 'core' | 'runtime' | 'control' | 'integration';\nexport type ModuleActivationMode = 'boot' | 'route' | 'lazy';\n\nexport interface ModuleDescriptor<TConfig = Record<string, unknown>> {\n  id: ModuleId;\n  name: string;\n  summary: string;\n  version: string;\n  category: ModuleCategory;\n  entryPoint: string;\n  activationMode: ModuleActivationMode;\n  routes: RouteId[];\n  widgets?: WidgetKey[];\n  defaultConfig?: TConfig;\n}\n\nexport type WidgetMountPoint = 'navigation' | 'panel' | 'context' | 'sheet' | 'manifest';\n\nexport interface WidgetDescriptor {\n  key: WidgetKey;\n  type: 'navigation' | 'panel' | 'context' | 'sheet';\n  moduleId: ModuleId;\n  component: string;\n  mountPoint: WidgetMountPoint;\n  routes: RouteId[];\n  description: string;\n}",
+      "fileType": "ts"
+    },
+    {
+      "path": "src/app/Modules/useManifest.ts",
+      "size": 3000,
+      "firstLines": "import { useCallback, useMemo } from 'react';\nimport manifestJson from './module-manifest.json';\nimport type {\n  ModuleDescriptor,\n  ModuleId,\n  ModuleManifestV2,\n  RouteBindingDescriptor,\n  WidgetDescriptor,\n  WidgetKey,\n} from './ModuleLoader';\nimport type { ManifestNavigationSpecV2 } from '../Navigation/NavigationMap';\nimport type { RouteId } from '../Navigation/routes';\n\nconst manifest = manifestJson as ModuleManifestV2;\n\nexport interface ManifestAccessResult<\n  TModule extends ModuleId = ModuleId,\n  TWidget extends WidgetKey = WidgetKey,\n> {\n  manifest: ModuleManifestV2;\n  navigationSpec: ManifestNavigationSpecV2;\n  getModule: (moduleId: TModule) => ModuleDescriptor | undefined;\n  getWidget: (widgetKey: TWidget) => WidgetDescriptor | undefined;\n  getRouteBinding: (routeId: RouteId) => RouteBindingDescriptor | undefined;\n  getModulesForRoute: (routeId: RouteId) => ModuleDescriptor[];\n  getWidgetsForRoute: (routeId: RouteId) => WidgetDescriptor[];\n  listModules: () => ModuleDescriptor[];\n  listWidgets: () => WidgetDescriptor[];\n}",
+      "fileType": "ts"
+    },
+    {
+      "path": "src/app/Modules/runtime/module-default.ts",
+      "size": 1300,
+      "firstLines": "import type { ReactElement } from 'react';\nimport type { ModuleDescriptor } from '../ModuleLoader';\nimport { moduleManifest } from '../ModuleLoader';\n\ntype ModuleEntryType = 'runtime' | 'fallback';\n\ntype ModuleEntry<TMetadata = Record<string, unknown>> = {\n  id: `factory.${string}`;\n  type: ModuleEntryType;\n  mount: () => ReactElement | null;\n  preload: () => Promise<void>;\n  metadata?: TMetadata;\n};\n\ntype DefaultModuleMetadata = {\n  descriptor: ModuleDescriptor | null;\n  manifestVersion: string;\n  loaderFallback: true;\n  reason: string;\n};\n\nconst descriptor =\n  moduleManifest.registry.modules.find((entry) => entry.entryPoint === './runtime/module-default.ts') ?? null;",
+      "fileType": "ts"
+    },
+    {
+      "path": "src/app/Modules/runtime/module-error.ts",
+      "size": 1300,
+      "firstLines": "import type { ReactElement } from 'react';\nimport type { ModuleDescriptor } from '../ModuleLoader';\nimport { moduleManifest } from '../ModuleLoader';\n\ntype ModuleEntryType = 'runtime' | 'fallback';\n\ntype ModuleEntry<TMetadata = Record<string, unknown>> = {\n  id: `factory.${string}`;\n  type: ModuleEntryType;\n  mount: () => ReactElement | null;\n  preload: () => Promise<void>;\n  metadata?: TMetadata;\n};\n\ntype ErrorModuleMetadata = {\n  descriptor: ModuleDescriptor | null;\n  manifestVersion: string;\n  loaderFallback: true;\n  reason: string;\n  lastError?: string;\n};\n\nconst descriptor =\n  moduleManifest.registry.modules.find((entry) => entry.entryPoint === './runtime/module-error.ts') ?? null;",
+      "fileType": "ts"
+    },
+    {
+      "path": "src/app/Modules/runtime/module-home.ts",
+      "size": 1200,
+      "firstLines": "import React from 'react';\nimport HomePage from '../../Home/HomePage';\nimport type { ModuleDescriptor } from '../ModuleLoader';\nimport { moduleManifest } from '../ModuleLoader';\n\ntype ModuleEntryType = 'runtime' | 'fallback';\n\ntype ModuleEntry<TMetadata = Record<string, unknown>> = {\n  id: `factory.${string}`;\n  type: ModuleEntryType;\n  mount: () => React.ReactElement | null;\n  preload: () => Promise<void>;\n  metadata?: TMetadata;\n};\n\ntype HomeModuleMetadata = {\n  descriptor: ModuleDescriptor | null;\n  manifestVersion: string;\n  loaderFallback: false;\n};\n\nconst descriptor =\n  moduleManifest.registry.modules.find((entry) => entry.entryPoint === './runtime/module-home.ts') ?? null;",
+      "fileType": "ts"
+    },
+    {
+      "path": "src/app/Navigation/NavigationMap.ts",
+      "size": 4800,
+      "firstLines": "import { NAVIGATION_BLUEPRINT, type NavigationRouteDefinition, type PanelRule, type RouteId } from './routes';\n\ntype RouteOrigin = 'blueprint' | 'manifest';\n\nexport interface ManifestNavigationExtension\n  extends Partial<Omit<NavigationRouteDefinition, 'children' | 'order'>> {\n  id: RouteId;\n  path: string;\n  label: string;\n  summary: string;\n  order?: number;\n  parentId?: RouteId;\n  panelRules?: PanelRule[];\n  children?: ManifestNavigationExtension[];\n}\n\nexport interface ManifestNavigationSpecV2 {\n  version: string;\n  navigation?: {\n    extends?: ManifestNavigationExtension[];\n  };\n}\n\ninterface MutableRoute extends Omit<NavigationRouteDefinition, 'children'> {\n  children: MutableRoute[];\n  __origin: RouteOrigin;\n}\n\nexport interface NavigationNode extends Omit<NavigationRouteDefinition, 'children'> {\n  children: NavigationNode[];\n  depth: number;\n  breadcrumb: string[];\n  origin: RouteOrigin;\n  parent?: RouteId;\n}",
+      "fileType": "ts"
+    },
+    {
+      "path": "src/app/Navigation/RouteResolver.ts",
+      "size": 2400,
+      "firstLines": "import { FALLBACK_ROUTE_ID, RouteId } from './routes';\nimport type { NavigationNode } from './NavigationMap';\n\nexport interface RouteMatch {\n  route: NavigationNode;\n  path: string;\n  params: Record<string, string>;\n}\n\nconst sanitizePath = (path: string): string => {\n  if (!path) {\n    return '/';\n  }\n  const normalized = path.split('?')[0].replace(/\\/{2,}/g, '/');\n  if (!normalized.startsWith('/')) {\n    return `/${normalized}`;\n  }\n  return normalized.endsWith('/') && normalized !== '/' ? normalized.slice(0, -1) : normalized;\n};\n\nexport class RouteResolver {\n  private readonly byId = new Map<RouteId, NavigationNode>();\n  private readonly byPath = new Map<string, NavigationNode>();\n  private readonly fallbackRoute: NavigationNode;\n\n  constructor(nodes: NavigationNode[]) {\n    if (!nodes.length) {\n      throw new Error('RouteResolver requires at least one route in de navigatieboom.');\n    }\n    this.index(nodes);\n    this.fallbackRoute = this.byId.get(FALLBACK_ROUTE_ID) ?? nodes[0];\n  }",
+      "fileType": "ts"
+    },
+    {
+      "path": "src/app/Navigation/routes.ts",
+      "size": 9800,
+      "firstLines": "import type { ReactNode } from 'react';\n\nexport type RouteId = `factory.${string}`;\n\nexport type NavigationCategory = 'hub' | 'workbench' | 'runtime' | 'control';\n\nexport type BlueprintLayer = 'core' | 'workspace' | 'system';\n\nexport type PanelBehavior = 'locked-open' | 'contextual';\n\nexport interface PanelRule {\n  target: 'left' | 'right';\n  mode?: 'inline' | 'overlay';\n  behavior: PanelBehavior;\n  defaultState: 'open' | 'closed';\n  label?: string;\n  payloadSlot?: 'navigation' | 'context' | 'manifest' | 'custom';\n}\n\nexport interface ManifestBinding {\n  slot: 'navigation' | 'panel' | 'sheet';\n  key: string;\n  optional?: boolean;\n}\n\nexport interface RouteGuard {\n  featureFlag?: string;\n  manifestKey?: string;\n  blueprintMinimum?: string;\n}\n\nexport interface NavigationRouteDefinition {\n  id: RouteId;\n  path: string;\n  label: string;\n  summary: string;\n  order: number;\n  category: NavigationCategory;\n  blueprint: BlueprintLayer;\n  parentId?: RouteId;\n  icon?: string;\n  hero?: ReactNode;\n  tags?: string[];\n  panelRules?: PanelRule[];\n  manifestBinding?: ManifestBinding;\n  guards?: RouteGuard;\n  children?: NavigationRouteDefinition[];\n}",
+      "fileType": "ts"
+    },
+    {
+      "path": "src/app/Navigation/useNavigation.ts",
+      "size": 5000,
+      "firstLines": "import { useCallback, useEffect, useMemo, useState } from 'react';\nimport { buildNavigationMap, type ManifestNavigationSpecV2, type NavigationNode } from './NavigationMap';\nimport { createRouteResolver, type RouteMatch } from './RouteResolver';\nimport type { RouteId, PanelRule } from './routes';\nimport { useShellControllers } from '../Shell/ShellRoot';\n\nexport interface UseNavigationOptions {\n  manifest?: ManifestNavigationSpecV2 | null;\n  initialTarget?: RouteId | string;\n}\n\nexport interface NavigateOptions {\n  replace?: boolean;\n  silent?: boolean;\n  via?: 'click' | 'keyboard' | 'programmatic';\n}\n\nexport interface NavigationAPI {\n  map: NavigationNode[];\n  activeRoute: RouteMatch;\n  navigate: (target: RouteId | string, options?: NavigateOptions) => RouteMatch;\n  resolve: (target: RouteId | string) => RouteMatch;\n}\n\nconst getInitialPath = () => {\n  if (typeof window === 'undefined') {\n    return '/';\n  }\n  return window.location?.pathname ?? '/';\n};",
+      "fileType": "ts"
+    },
+    {
+      "path": "src/app/pwa/registerSW.ts",
+      "size": 2700,
+      "firstLines": "declare const __PWA_BUILD_TIME__: string | undefined;\n\ntype RegisterOptions = {\n  immediate?: boolean;\n  onUpdate?: (registration: ServiceWorkerRegistration) => void;\n  onReady?: (registration: ServiceWorkerRegistration) => void;\n};\n\nconst getBuildRevision = () =>\n  import.meta.env?.VITE_PWA_BUILD_ID ?? __PWA_BUILD_TIME__ ?? new Date().toISOString();\n\nconst SW_URL = `/service-worker.js?v=${encodeURIComponent(getBuildRevision())}`;\n\nconst isSupported = () => 'serviceWorker' in navigator && window.isSecureContext;\n\nconst watchForUpdates = (\n  registration: ServiceWorkerRegistration,\n  onUpdate?: (registration: ServiceWorkerRegistration) => void,\n) => {\n  registration.addEventListener('updatefound', () => {\n    const newWorker = registration.installing;\n    if (!newWorker) {\n      return;\n    }",
+      "fileType": "ts"
+    },
+    {
+      "path": "src/app/pwa/useInstallPrompt.ts",
+      "size": 2100,
+      "firstLines": "import { useCallback, useEffect, useState } from 'react';\n\ntype BeforeInstallPromptEvent = Event & {\n  prompt: () => Promise<void>;\n  userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;\n};\n\nexport type InstallPromptController = {\n  canInstall: boolean;\n  dismissed: boolean;\n  prompt: () => Promise<'accepted' | 'dismissed' | 'unavailable'>;\n  reset: () => void;\n};\n\nexport const useInstallPrompt = (): InstallPromptController => {\n  const [promptEvent, setPromptEvent] = useState<BeforeInstallPromptEvent | null>(null);\n  const [dismissed, setDismissed] = useState(false);\n\n  useEffect(() => {\n    const handleBeforeInstall = (event: Event) => {\n      const typedEvent = event as BeforeInstallPromptEvent;\n      typedEvent.preventDefault();\n      setPromptEvent(typedEvent);\n      setDismissed(false);\n    };\n\n    const handleInstalled = () => {\n      setPromptEvent(null);\n      setDismissed(false);\n    }",
+      "fileType": "ts"
+    },
+    {
+      "path": "src/app/Shell/BottomSheet.tsx",
+      "size": 5000,
+      "firstLines": "import React, { useEffect } from 'react';\nimport { ShellTokens } from './LeftPanel';\n\nexport interface SheetViewModel {\n  isOpen: boolean;\n  headline?: string;\n  subline?: string;\n  content: React.ReactNode | null;\n  size: 'auto' | 'full';\n  dismissible: boolean;\n  scrim: boolean;\n}\n\ninterface BottomSheetProps {\n  model: SheetViewModel;\n  tokens: ShellTokens;\n  onDismiss: () => void;\n}\n\nconst BottomSheet: React.FC<BottomSheetProps> = ({ model, tokens, onDismiss }) => {\n  useEffect(() => {\n    if (!model.isOpen || typeof document === 'undefined') {\n      return;\n    }\n    const previousOverflow = document.body.style.overflow;\n    document.body.style.overflow = 'hidden';\n    return () => {\n      document.body.style.overflow = previousOverflow;\n    };\n  }, [model.isOpen]);",
+      "fileType": "tsx"
+    },
+    {
+      "path": "src/app/Shell/Footer.tsx",
+      "size": 1100,
+      "firstLines": "import React from 'react';\nimport { ShellTokens } from './LeftPanel';\n\ninterface FooterProps {\n  tokens: ShellTokens;\n  content?: React.ReactNode;\n  status?: React.ReactNode;\n}\n\nconst Footer: React.FC<FooterProps> = ({ tokens, content, status }) => {\n  const style: React.CSSProperties = {\n    position: 'sticky',\n    bottom: 0,\n    height: tokens.layout.footerHeight,\n    display: 'flex',\n    alignItems: 'center',\n    justifyContent: 'space-between',\n    padding: `0 ${tokens.spacing.lg}px`,\n    background: `linear-gradient(90deg, ${tokens.color.surfaceAlt} 0%, ${tokens.color.surface} 100%)`,\n    borderTop: `1px solid ${tokens.color.border}`,\n    color: tokens.color.textSecondary,\n    fontSize: 13,\n    letterSpacing: 0.2,\n  };",
+      "fileType": "tsx"
+    },
+    {
+      "path": "src/app/Shell/Header.tsx",
+      "size": 4000,
+      "firstLines": "import React from 'react';\nimport { ShellTokens } from './LeftPanel';\n\ninterface HeaderProps {\n  tokens: ShellTokens;\n  title?: string;\n  navigation?: React.ReactNode;\n  leadingSlot?: React.ReactNode;\n  trailingSlot?: React.ReactNode;\n  leftPanelOpen: boolean;\n  rightPanelOpen: boolean;\n  onToggleLeftPanel?: () => void;\n  onToggleRightPanel?: () => void;\n}\n\nconst Header: React.FC<HeaderProps> = ({\n  tokens,\n  title,\n  navigation,\n  leadingSlot,\n  trailingSlot,\n  leftPanelOpen,\n  rightPanelOpen,\n  onToggleLeftPanel,\n  onToggleRightPanel,\n}) => {\n  const baseStyle: React.CSSProperties = {\n    position: 'sticky',\n    top: 0,\n    zIndex: tokens.zIndex.header,\n    display: 'grid',\n    gridTemplateColumns: 'auto 1fr auto',\n    alignItems: 'center',\n    height: tokens.layout.headerHeight,\n    padding: `0 ${tokens.spacing.lg}px`,\n    background: `linear-gradient(90deg, ${tokens.color.surface} 0%, ${tokens.color.surfaceAlt} 100%)`,\n    borderBottom: `1px solid ${tokens.color.border}`,\n  };",
+      "fileType": "tsx"
+    },
+    {
+      "path": "src/app/Shell/LeftPanel.tsx",
+      "size": 4200,
+      "firstLines": "import React, { ReactNode } from 'react';\n\nexport interface ShellTokens {\n  readonly color: {\n    background: string;\n    surface: string;\n    surfaceAlt: string;\n    accent: string;\n    accentMuted: string;\n    border: string;\n    textPrimary: string;\n    textSecondary: string;\n    danger: string;\n    success: string;\n    warning: string;\n  };\n  readonly spacing: {\n    xs: number;\n    sm: number;\n    md: number;\n    lg: number;\n    xl: number;\n  };\n  readonly radius: {\n    sm: number;\n    md: number;\n    lg: number;\n  };\n  readonly shadow: {\n    overlay: string;\n    toast: string;\n  };\n  readonly layout: {\n    headerHeight: number;\n    footerHeight: number;\n    panelWidth: number;\n    maxSheetHeight: number;\n  };\n  readonly motion: {\n    durationShort: number;\n    durationMedium: number;\n    durationLong: number;\n    easingStandard: string;\n  };\n  readonly zIndex: {\n    header: number;\n    panels: number;\n    sheet: number;\n    toast: number;\n    overlay: number;\n  };\n}",
+      "fileType": "tsx"
+    },
+    {
+      "path": "src/app/Shell/RightPanel.tsx",
+      "size": 2100,
+      "firstLines": "import React from 'react';\nimport { PanelViewModel, ShellTokens } from './LeftPanel';\n\ninterface RightPanelProps {\n  model: PanelViewModel;\n  tokens: ShellTokens;\n  onClose: () => void;\n}\n\nconst RightPanel: React.FC<RightPanelProps> = ({ model, tokens, onClose }) => {\n  const isOverlay = model.mode === 'overlay';\n  const hidden = !model.isOpen && isOverlay;\n  const panelStyle: React.CSSProperties = {\n    position: isOverlay ? 'fixed' : 'relative',\n    top: isOverlay ? tokens.layout.headerHeight : 0,\n    bottom: isOverlay ? tokens.layout.footerHeight : 0,\n    right: 0,\n    width: model.width,\n    backgroundColor: tokens.color.surfaceAlt,\n    borderLeft: `1px solid ${tokens.color.border}`,\n    boxShadow: model.isOpen ? tokens.shadow.overlay : 'none',\n    transform: model.isOpen ? 'translateX(0)' : 'translateX(100%)',\n    transition: `transform ${tokens.motion.durationMedium}ms ${tokens.motion.easingStandard}, opacity ${tokens.motion.durationShort}ms ${tokens.motion.easingStandard}`,\n    opacity: model.isOpen ? 1 : isOverlay ? 0 : 1,\n    zIndex: tokens.zIndex.panels,\n    display: 'flex',\n    flexDirection: 'column',\n    overflow: 'hidden',\n    pointerEvents: hidden ? 'none' : 'auto',\n  };",
+      "fileType": "tsx"
+    },
+    {
+      "path": "src/app/Shell/ShellRoot.tsx",
+      "size": 12000,
+      "firstLines": "import React, {\n  ReactNode,\n  createContext,\n  useCallback,\n  useContext,\n  useEffect,\n  useMemo,\n  useState,\n} from 'react';\nimport Header from './Header';\nimport Footer from './Footer';\nimport LeftPanel, { PanelViewModel, ShellTokens } from './LeftPanel';\nimport RightPanel from './RightPanel';\nimport BottomSheet, { SheetViewModel } from './BottomSheet';\nimport ToastHost, { ToastMessage } from './ToastHost';\n\ntype PanelPosition = 'left' | 'right';\n\nexport interface PanelController {\n  readonly id: PanelPosition;\n  readonly state: PanelViewModel;\n  open(content?: ReactNode, options?: Partial<PanelViewModel>): void;\n  close(): void;\n  toggle(content?: ReactNode, options?: Partial<PanelViewModel>): void;\n  configure(options: Partial<PanelViewModel>): void;\n  setContent(content: ReactNode | null): void;\n}\n\nexport interface SheetController {\n  readonly state: SheetViewModel;\n  present(content: ReactNode, options?: Partial<SheetViewModel>): void;\n  update(options: Partial<SheetViewModel>): void;\n  dismiss(): void;\n}\n\nexport interface ToastController {\n  readonly toasts: ToastMessage[];\n  push(toast: Omit<ToastMessage, 'id' | 'createdAt'> & { id?: string }): string;\n  dismiss(id: string): void;\n  clear(): void;\n}",
+      "fileType": "tsx"
+    },
+    {
+      "path": "src/app/Shell/ToastHost.tsx",
+      "size": 4000,
+      "firstLines": "import React, { useEffect } from 'react';\nimport { ShellTokens } from './LeftPanel';\n\nexport interface ToastMessage {\n  id: string;\n  title: string;\n  description?: string;\n  kind: 'neutral' | 'positive' | 'warning' | 'negative';\n  autoDismissAfter?: number;\n  createdAt: number;\n  dismissible: boolean;\n}\n\ninterface ToastHostProps {\n  tokens: ShellTokens;\n  items: ToastMessage[];\n  onDismiss: (id: string) => void;\n}\n\nconst kindColor = (tokens: ShellTokens, kind: ToastMessage['kind']) => {\n  switch (kind) {\n    case 'positive':\n      return tokens.color.success;\n    case 'warning':\n      return tokens.color.warning;\n    case 'negative':\n      return tokens.color.danger;\n    default:\n      return tokens.color.accent;\n  }\n};",
+      "fileType": "tsx"
+    },
+    {
+      "path": "src/app/StateMachine/dispatch.ts",
+      "size": 2000,
+      "firstLines": "import { PWAFactoryState, initialState } from './globalState';\nimport { StateAction, rootReducer } from './reducers';\n\nexport type SyncAction = StateAction;\nexport type AsyncAction = (api: DispatchAPI) => Promise<void> | void;\nexport type AnyAction = SyncAction | AsyncAction;\n\nexport type Dispatch = (action: AnyAction) => Promise<PWAFactoryState>;\n\nexport interface DispatchAPI {\n  getState: () => PWAFactoryState;\n  dispatch: Dispatch;\n}\n\nexport type Listener = (state: PWAFactoryState, action: StateAction) => void;\n\nexport interface StateMachine {\n  getState: () => PWAFactoryState;\n  dispatch: Dispatch;\n  subscribe: (listener: Listener) => () => void;\n}\n\nexport interface CreateStateMachineOptions {\n  reducer?: typeof rootReducer;\n  preloadedState?: PWAFactoryState;\n}\n\nexport const createStateMachine = (options?: CreateStateMachineOptions): StateMachine => {\n  const reducer = options?.reducer ?? rootReducer;\n  let state: PWAFactoryState = options?.preloadedState ?? initialState;\n  const listeners = new Set<Listener>();",
+      "fileType": "ts"
+    },
+    {
+      "path": "src/app/StateMachine/globalState.ts",
+      "size": 3800,
+      "firstLines": "/**\n * Global state definitions for the generic PWA Factory state machine (v2.0).\n * This file intentionally avoids product-specific fields so it can be reused\n * across multiple PWA Factory apps.\n */\n\nexport type AppLifecyclePhase = 'booting' | 'ready' | 'background' | 'suspended' | 'error';\n\nexport interface AppLifecycleState {\n  phase: AppLifecyclePhase;\n  launchedAt: number;\n  lastVisibilityChange?: number;\n  lastError?: string;\n  resumeCount: number;\n}\n\nexport type PanelSlot = 'leftPanel' | 'rightPanel';\nexport type SheetSlot = 'bottomSheet';\n\nexport interface PanelState {\n  isOpen: boolean;\n  lockedByModule?: string;\n  lastToggledAt?: number;\n}\n\nexport interface SheetState {\n  isOpen: boolean;\n  anchoredTo?: string;\n  lastToggledAt?: number;\n}",
+      "fileType": "ts"
+    },
+    {
+      "path": "src/app/StateMachine/reducers.ts",
+      "size": 6800,
+      "firstLines": "import {\n  AppLifecyclePhase,\n  ManifestModuleState,\n  ManifestModuleStatus,\n  PanelSlot,\n  PanelState,\n  PWAFactoryState,\n  SheetSlot,\n  SheetState,\n  initialState,\n} from './globalState';\n\ntype PanelPayload = { panel: PanelSlot; isOpen: boolean; lockedByModule?: string | null };\ntype SheetPayload = { sheet: SheetSlot; isOpen: boolean; anchoredTo?: string | null };\n\nexport type StateAction =\n  | { type: 'LIFECYCLE/SET_PHASE'; payload: { phase: AppLifecyclePhase; error?: string | null } }\n  | { type: 'LIFECYCLE/SET_VISIBILITY'; payload: { phase: Exclude<AppLifecyclePhase, 'error'>; timestamp?: number } }\n  | { type: 'NAVIGATION/SET_PENDING'; payload: { routeId?: string; params?: Record<string, unknown> } }\n  | { type: 'NAVIGATION/RESOLVE_ROUTE'; payload: { routeId: string; params?: Record<string, unknown> } }\n  | { type: 'SHELL/SET_PANEL_STATE'; payload: PanelPayload }\n  | { type: 'SHELL/SET_SHEET_STATE'; payload: SheetPayload }\n  | { type: 'UX/SET_LOADING'; payload: { token: string; active: boolean } }\n  | { type: 'UX/SET_DISABLED'; payload: { token: string; active: boolean } }\n  | { type: 'MANIFEST/REGISTER_MODULE'; payload: { module: ManifestModuleState } }\n  | {\n      type: 'MANIFEST/UPDATE_MODULE';\n      payload: {\n        moduleId: string;\n        patch?: Record<string, unknown>;\n        status?: ManifestModuleStatus;\n        version?: string;\n        lastError?: string | null;\n      };\n    }\n  | { type: 'MANIFEST/UNREGISTER_MODULE'; payload: { moduleId: string } };",
+      "fileType": "ts"
+    },
+    {
+      "path": "src/app/StateMachine/selectors.ts",
+      "size": 2100,
+      "firstLines": "import {\n  AppLifecyclePhase,\n  ManifestModuleState,\n  PanelSlot,\n  PWAFactoryState,\n  SheetSlot,\n} from './globalState';\n\nexport const selectLifecyclePhase = (state: PWAFactoryState): AppLifecyclePhase => state.lifecycle.phase;\n\nexport const selectLifecycle = (state: PWAFactoryState) => state.lifecycle;\n\nexport const selectNavigation = (state: PWAFactoryState) => state.navigation;\n\nexport const selectCurrentRoute = (state: PWAFactoryState) => state.navigation.currentRoute;\n\nexport const selectPendingRoute = (state: PWAFactoryState) => state.navigation.pendingRoute;\n\nexport const selectRouteHistory = (state: PWAFactoryState) => state.navigation.history;\n\nexport const selectIsPanelOpen =\n  (panel: PanelSlot) =>\n  (state: PWAFactoryState): boolean =>\n    Boolean(state.shell.panels.slots[panel]?.isOpen);\n\nexport const selectPanelState =\n  (panel: PanelSlot) =>\n  (state: PWAFactoryState) =>\n    state.shell.panels.slots[panel];",
+      "fileType": "ts"
+    },
+    {
+      "path": "src/app/Widgets/WidgetRegistry.tsx",
+      "size": 14000,
+      "firstLines": "import React, {\n  ReactNode,\n  createContext,\n  useCallback,\n  useContext,\n  useEffect,\n  useMemo,\n  useRef,\n  useState,\n} from 'react';\nimport type {\n  ModuleLoader,\n  ModuleManifestV2,\n  WidgetDescriptor,\n  WidgetKey,\n  WidgetMountPoint,\n} from '../Modules/ModuleLoader';\nimport type { RouteId } from '../Navigation/routes';\nimport type { StateMachine } from '../StateMachine/dispatch';\n\ntype WidgetStatus = 'idle' | 'loading' | 'ready' | 'error';\n\nexport interface WidgetRuntimeProps {\n  descriptor: WidgetDescriptor;\n  routeId: RouteId;\n  mountPoint: WidgetMountPoint;\n  stateMachine: StateMachine;\n  moduleLoader: ModuleLoader;\n}\n\ntype WidgetComponent = React.ComponentType<WidgetRuntimeProps>;\n\ntype WidgetModule = {\n  default?: WidgetComponent;\n  Widget?: WidgetComponent;\n};",
+      "fileType": "tsx"
+    },
+    {
+      "path": "src/firebase/firebase.app.ts",
+      "size": 500,
+      "firstLines": "import { getApp, getApps, initializeApp, type FirebaseApp } from 'firebase/app';\n\nimport { getFirebaseConfig } from './firebase.config';\n\nconst bootstrapFirebaseApp = (): FirebaseApp => {\n  if (getApps().length) {\n    return getApp();\n  }\n\n  return initializeApp(getFirebaseConfig());\n};\n\nexport const getFirebaseApp = (): FirebaseApp => bootstrapFirebaseApp();\n",
+      "fileType": "ts"
+    },
+    {
+      "path": "src/firebase/firebase.config.ts",
+      "size": 1600,
+      "firstLines": "import type { FirebaseOptions } from 'firebase/app';\n\ntype FirebaseEnvKey =\n  | 'VITE_FIREBASE_API_KEY'\n  | 'VITE_FIREBASE_AUTH_DOMAIN'\n  | 'VITE_FIREBASE_PROJECT_ID'\n  | 'VITE_FIREBASE_STORAGE_BUCKET'\n  | 'VITE_FIREBASE_MESSAGING_SENDER_ID'\n  | 'VITE_FIREBASE_APP_ID'\n  | 'VITE_FIREBASE_MEASUREMENT_ID';\n\nconst readEnv = (key: FirebaseEnvKey): string => {\n  if (typeof import.meta !== 'undefined' && import.meta.env && key in import.meta.env) {\n    return import.meta.env[key] ?? '';\n  }\n\n  if (typeof process !== 'undefined' && process.env && key in process.env) {\n    return process.env[key] ?? '';\n  }\n\n  return '';\n};\n\nexport const firebaseConfig: FirebaseOptions = {\n  apiKey: readEnv('VITE_FIREBASE_API_KEY'),\n  authDomain: readEnv('VITE_FIREBASE_AUTH_DOMAIN'),\n  projectId: readEnv('VITE_FIREBASE_PROJECT_ID'),\n  storageBucket: readEnv('VITE_FIREBASE_STORAGE_BUCKET'),\n  messagingSenderId: readEnv('VITE_FIREBASE_MESSAGING_SENDER_ID'),\n  appId: readEnv('VITE_FIREBASE_APP_ID'),\n  measurementId: readEnv('VITE_FIREBASE_MEASUREMENT_ID') || undefined,\n};",
+      "fileType": "ts"
+    },
+    {
+      "path": "src/firebase/firebase.db.ts",
+      "size": 200,
+      "firstLines": "import { getFirestore, type Firestore } from 'firebase/firestore';\n\nimport { getFirebaseApp } from './firebase.app';\n\nexport const getFirebaseDb = (): Firestore => getFirestore(getFirebaseApp());\n",
+      "fileType": "ts"
+    }
+  ]
+}
