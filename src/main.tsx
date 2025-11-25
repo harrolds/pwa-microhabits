@@ -1,9 +1,14 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { Shell } from './app/Shell/Shell';
+import { BrowserRouter } from "react-router-dom";
+import { Shell } from "./app/Shell/Shell";
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
+const root = document.getElementById("root") as HTMLElement;
+
+ReactDOM.createRoot(root).render(
   <React.StrictMode>
-    <Shell />
+    <BrowserRouter>
+      <Shell />
+    </BrowserRouter>
   </React.StrictMode>
 );
