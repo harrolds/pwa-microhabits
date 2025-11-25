@@ -2,7 +2,7 @@ import React, { StrictMode, Suspense } from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 
-import AppShell from '@app/Shell/AppShell'
+import { AppShell } from '@app/Shell/AppShell'
 import { loadModule } from '@app/modules/loader'
 import '@pwa/registerSW'
 
