@@ -1,1 +1,0 @@
-export default ()=> <div>Example Module Screen</div>
