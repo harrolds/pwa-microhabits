@@ -1,3 +1,1 @@
-export function HomeScreen() {
-  return <div>Home</div>;
-}
+export function HomeScreen(){return <div>Home Screen OK</div>;}
