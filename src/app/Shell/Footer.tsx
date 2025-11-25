@@ -1,9 +1,7 @@
-export default function Footer() {
-  const year = new Date().getFullYear()
+export const Footer = () => {
   return (
     <footer className="app-shell__footer">
-      <small>PWA Factory Skeleton v3.0 • © {year}</small>
+      <p>© 2025 PWA Factory Skeleton</p>
     </footer>
-  )
-}
-
+  );
+};
