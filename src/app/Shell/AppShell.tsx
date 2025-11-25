@@ -19,7 +19,7 @@ import { ToastHost as BatchToastHost } from '@app/layout/toasts/ToastHost';
 import { CommandPalette } from '@app/commands/palette/CommandPalette';
 
 // Debug layer
-import { DebugLayer } from '@debug/DebugLayer';
+import { DebugLayer } from '../../debug/DebugLayer';
 
 // Global tokens
 import '@app/tokens/tokens.css';
