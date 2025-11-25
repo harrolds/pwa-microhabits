@@ -23,6 +23,12 @@ import '@app/tokens/tokens.css';
 
 // Global layout styles for shell (optional if you use a shared stylesheet)
 import './AppShell.css';
+// Layout subsystem styles
+import '@app/layout/panels/panel.css';
+import '@app/layout/sheets/sheet.css';
+import '@app/layout/overlays/overlay.css';
+import '@app/layout/toasts/toast.css';
+import '@app/commands/palette/palette.css';
 
 export const AppShell: React.FC = () => {
   return (
