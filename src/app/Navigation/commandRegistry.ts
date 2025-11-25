@@ -13,6 +13,7 @@ const registry: CommandRegistry = {
 }
 
 const listeners = new Set<Listener>()
+let snapshot = Object.values(registry)
 
 function emit() {
   listeners.forEach((listener) => listener())
@@ -23,11 +24,12 @@ export function getCommand(id: string) {
 }
 
 export function listCommands() {
-  return Object.values(registry)
+  return snapshot
 }
 
 export function registerCommand(def: CommandDef) {
   registry[def.id] = def
+  snapshot = Object.values(registry)
   emit()
 }
 

@@ -4,6 +4,7 @@ import type { ModuleMeta } from './types'
 
 const registry: ModuleMeta[] = []
 const listeners = new Set<() => void>()
+let snapshot: ModuleMeta[] = []
 
 function emit() {
   listeners.forEach((listener) => listener())
@@ -16,11 +17,12 @@ export function registerModule(meta: ModuleMeta) {
   } else {
     registry.push(meta)
   }
+  snapshot = [...registry]
   emit()
 }
 
 export function listModules() {
-  return [...registry]
+  return snapshot
 }
 
 function subscribe(listener: () => void) {
