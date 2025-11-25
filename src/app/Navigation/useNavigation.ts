@@ -1,58 +1,35 @@
-import type { ComponentType } from 'react';
-import { useEffect, useMemo, useState } from 'react';
-import { getRouteDefinition, listRoutes, matchRouteByPath, RouteDefinition, RouteId } from './routes';
+import { useEffect, useState } from "react";
+import { commandToPath } from "./LinkNavigation";
+import { resolveCommandFromPath } from "./routes";
+import { CommandName, CommandPayload } from "./NavigationTypes";
+import { commandRegistry } from "./CommandRegistry";
 
-type LoadedRoute = {
-  definition: RouteDefinition;
-  component: ComponentType | null;
-};
+const FALLBACK_COMMAND: CommandName = "home";
 
-export const useNavigation = () => {
-  const [current, setCurrent] = useState<LoadedRoute>(() => ({
-    definition: matchRouteByPath(window.location.pathname),
-    component: null,
-  }));
+export function useNavigation() {
+  const [command, setCommand] = useState<CommandName>(FALLBACK_COMMAND);
 
+  // Resolve initial command from current URL
   useEffect(() => {
-    let active = true;
-    current.definition.loader().then((module) => {
-      if (active) {
-        setCurrent((prev) => ({
-          ...prev,
-          component: module.default,
-        }));
-      }
-    });
-    return () => {
-      active = false;
-    };
-  }, [current.definition]);
-
-  useEffect(() => {
-    const handler = () => {
-      setCurrent({
-        definition: matchRouteByPath(window.location.pathname),
-        component: null,
-      });
-    };
-    window.addEventListener('popstate', handler);
-    return () => window.removeEventListener('popstate', handler);
+    const resolved = resolveCommandFromPath(window.location.pathname);
+    if (resolved) {
+      setCommand(resolved);
+    }
   }, []);
 
-  const goTo = (routeId: RouteId) => {
-    const definition = getRouteDefinition(routeId);
-    window.history.pushState({ routeId }, definition.title, definition.path);
-    setCurrent({
-      definition,
-      component: null,
-    });
+  const navigate = (cmd: CommandName, payload?: CommandPayload) => {
+    const href = commandToPath(cmd, payload);
+    window.history.pushState({}, "", href);
+    setCommand(cmd);
   };
+
+  // Compute component dynamically
+  const entry = commandRegistry[command] ?? commandRegistry[FALLBACK_COMMAND];
+  const Component = entry?.component ?? commandRegistry[FALLBACK_COMMAND].component;
 
   return {
-    current: current.definition,
-    CurrentComponent: current.component,
-    goTo,
-    routes: useMemo(() => listRoutes(), []),
+    command: entry ? command : FALLBACK_COMMAND,
+    navigate,
+    Component,
   };
-};
-
+}

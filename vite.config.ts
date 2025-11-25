@@ -13,7 +13,7 @@ export default defineConfig({
       },
       output: {
         entryFileNames: (chunk) =>
-          chunk.name === 'service-worker' ? 'service-worker.js' : 'assets/[name]-[hash].js'
+          chunk.name === 'sw' ? 'service-worker.js' : 'assets/[name]-[hash].js'
       }
     }
   }

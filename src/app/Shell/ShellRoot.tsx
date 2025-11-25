@@ -1,19 +1,19 @@
-import { useEffect, useRef } from 'react';
-import clsx from 'clsx';
-import styles from './ShellRoot.module.css';
-import { Header } from './Header';
-import { Footer } from './Footer';
-import { LeftPanel } from './LeftPanel';
-import { RightPanel } from './RightPanel';
-import { PanelController, usePanelState } from '../Panels/PanelController';
-import { useAppState } from '../StateMachine/state';
-import { BottomSheet } from '../BottomSheet/BottomSheet';
-import { ToastHost } from '../Toasts/ToastHost';
-import { useToast } from '../Toasts/useToast';
-import { applySafeAreaPadding } from '../utils/safeArea';
+import { useEffect, useRef, type ReactNode } from "react";
+import clsx from "clsx";
+import styles from "./ShellRoot.module.css";
+import { Header } from "./Header";
+import { Footer } from "./Footer";
+import { LeftPanel } from "./LeftPanel";
+import { RightPanel } from "./RightPanel";
+import { PanelController, usePanelState } from "../Panels/PanelController";
+import { useAppState } from "../StateMachine/state";
+import { BottomSheet } from "../BottomSheet/BottomSheet";
+import { ToastHost } from "../Toasts/ToastHost";
+import { useToast } from "../Toasts/useToast";
+import { applySafeAreaPadding } from "../utils/safeArea";
 
 type ShellRootProps = {
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
 export const ShellRoot = ({ children }: ShellRootProps) => {

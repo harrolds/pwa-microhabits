@@ -1,12 +1,25 @@
-import { getRouteDefinition, RouteId } from './routes';
+import { commandRegistry } from "./CommandRegistry";
+import { CommandName, CommandPayload } from "./NavigationTypes";
 
-export type NavigationCommand = {
-  to: RouteId;
-};
+// ➜ Resolve absolute path from command
+export function commandToPath(command: CommandName, payload?: CommandPayload): string {
+  const entry = commandRegistry[command];
+  if (!entry) return "/";
 
-export const linkTo = (route: RouteId): NavigationCommand => ({ to: route });
+  let path = entry.path;
 
-export const commandToHref = (command: NavigationCommand): string => {
-  return getRouteDefinition(command.to).path;
-};
+  if (payload?.id) {
+    path = path.replace(":id", payload.id);
+  }
 
+  return path;
+}
+
+// ➜ Construct a navigation command descriptor
+export function linkTo(command: CommandName, payload?: CommandPayload) {
+  return {
+    command,
+    payload,
+    href: commandToPath(command, payload),
+  };
+}

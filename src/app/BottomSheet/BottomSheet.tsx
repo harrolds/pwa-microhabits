@@ -1,19 +1,26 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import clsx from 'clsx';
-import styles from './BottomSheet.module.css';
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type PointerEvent,
+  type ReactNode,
+} from "react";
+import clsx from "clsx";
+import styles from "./BottomSheet.module.css";
 import {
   setBottomSheetDrag,
   setBottomSheetLock,
   setBottomSheetSnap,
   setBottomSheetVisibility,
-} from '../StateMachine/actions';
-import { appStore, BottomSheetSnapPoint, useAppState } from '../StateMachine/state';
-import { lockBodyScroll, unlockBodyScroll } from '../utils/dom';
+} from "../StateMachine/actions";
+import { appStore, BottomSheetSnapPoint, useAppState } from "../StateMachine/state";
+import { lockBodyScroll, unlockBodyScroll } from "../utils/dom";
 
 const SNAP_POINTS: BottomSheetSnapPoint[] = [0.25, 0.55, 1];
 
 type BottomSheetProps = {
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
 export const BottomSheet = ({ children }: BottomSheetProps) => {
@@ -65,7 +72,7 @@ export const BottomSheet = ({ children }: BottomSheetProps) => {
     appStore.dispatch(setBottomSheetSnap(resolved));
   };
 
-  const handlePointerDown = (event: React.PointerEvent) => {
+  const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
     if (sheetState.locked) {
       return;
     }
@@ -74,7 +81,7 @@ export const BottomSheet = ({ children }: BottomSheetProps) => {
     appStore.dispatch(setBottomSheetLock(true));
   };
 
-  const handlePointerMove = (event: React.PointerEvent) => {
+  const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
     if (initialYRef.current == null) return;
     const delta = event.clientY - initialYRef.current;
     if (delta > 0) {
@@ -84,7 +91,7 @@ export const BottomSheet = ({ children }: BottomSheetProps) => {
     }
   };
 
-  const handlePointerUp = (event: React.PointerEvent) => {
+  const handlePointerUp = (event: PointerEvent<HTMLDivElement>) => {
     if (initialYRef.current == null) return;
     (event.target as HTMLElement).releasePointerCapture(event.pointerId);
     initialYRef.current = null;

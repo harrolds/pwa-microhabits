@@ -1,53 +1,22 @@
-import type { ComponentType } from 'react';
+import { commandRegistry } from "./CommandRegistry";
+import type { CommandName } from "./NavigationTypes";
 
-const routeModules = import.meta.glob('../modules/**/Route.tsx');
+// URL → command resolver
+export function resolveCommandFromPath(path: string): CommandName | null {
+  const commands = Object.keys(commandRegistry) as CommandName[];
 
-type RouteLoader = () => Promise<{ default: ComponentType }>;
+  for (const cmd of commands) {
+    const def = commandRegistry[cmd];
 
-export type RouteId = string;
+    const pattern = def.path
+      .replace(/:[a-zA-Z]+/g, "([^/]+)")
+      .replace(/\//g, "\\/");
 
-export type RouteDefinition = {
-  id: RouteId;
-  path: string;
-  title: string;
-  loader: () => Promise<{ default: ComponentType }>;
-};
+    const regex = new RegExp(`^${pattern}$`);
 
-const normalizeTitle = (id: string) => id.replace(/-/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
-
-const buildRoutePath = (id: string) => (id === 'dashboard' ? '/' : `/${id}`);
-
-const buildDefinitions = (): RouteDefinition[] => {
-  return (Object.entries(routeModules) as [string, RouteLoader][]).map(([key, loader]) => {
-    const id = key.replace('../modules/', '').replace('/Route.tsx', '');
-    return {
-      id,
-      path: buildRoutePath(id),
-      title: normalizeTitle(id),
-      loader,
-    };
-  });
-};
-
-const routeDefinitions = buildDefinitions();
-
-const routeMap: Record<RouteId, RouteDefinition> = routeDefinitions.reduce(
-  (acc, definition) => {
-    acc[definition.id] = definition;
-    return acc;
-  },
-  {} as Record<RouteId, RouteDefinition>,
-);
-
-export const getRouteDefinition = (routeId: RouteId) => routeMap[routeId];
-export const listRoutes = () => routeDefinitions;
-
-export const matchRouteByPath = (path: string): RouteDefinition => {
-  const normalized =
-    path === '/' ? '/' : path.replace(/\/+$/, '').replace(/\/{2,}/g, '/').toLowerCase();
-  return (
-    routeDefinitions.find((route) => route.path === normalized) ??
-    routeDefinitions.find((route) => route.path === '/')!
-  );
-};
-
+    if (regex.test(path)) {
+      return cmd;
+    }
+  }
+  return null;
+}
