@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import Shell from "./app/Shell/Shell";
+import { Shell } from './app/Shell/Shell';
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
