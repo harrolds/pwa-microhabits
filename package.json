@@ -9,9 +9,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "clsx": "^2.1.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "clsx": "^2.1.1"
+    "react-router-dom": "^7.9.6"
   },
   "devDependencies": {
     "@types/react": "^18.3.10",
@@ -21,4 +22,3 @@
     "vite": "^5.4.0"
   }
 }
-
