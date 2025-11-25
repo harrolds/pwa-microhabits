@@ -1,18 +1,19 @@
-import { useMemo } from 'react'
+import { useMemo } from 'react';
 
-import { useCommandList } from '@app/Navigation/commandRegistry'
-import { useCommandNav } from '@app/Navigation/useCommandNav'
-import { useInstallPrompt } from '@pwa/useInstallPrompt'
+import { useCommandList } from '@app/Navigation/commandRegistry';
+import { useCommandNav } from '@app/Navigation/useCommandNav';
+import { useInstallPrompt } from '@pwa/useInstallPrompt';
 
-export default function Header() {
-  const navigate = useCommandNav()
-  const commands = useCommandList()
-  const installPrompt = useInstallPrompt()
+// ✔ Named export — required by AppShell.tsx
+export const Header = () => {
+  const navigate = useCommandNav();
+  const commands = useCommandList();
+  const installPrompt = useInstallPrompt();
 
   const sortedCommands = useMemo(
     () => [...commands].sort((a, b) => a.title.localeCompare(b.title)),
     [commands]
-  )
+  );
 
   return (
     <header className="app-shell__header">
@@ -45,6 +46,5 @@ export default function Header() {
         </button>
       )}
     </header>
-  )
-}
-
+  );
+};
