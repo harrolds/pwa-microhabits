@@ -1,35 +1,42 @@
-import { useEffect, useState } from "react";
-import { commandToPath } from "./LinkNavigation";
-import { resolveCommandFromPath } from "./routes";
-import { CommandName, CommandPayload } from "./NavigationTypes";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Suspense, lazy } from "react";
 import { commandRegistry } from "./CommandRegistry";
+import type { CommandName } from "./NavigationTypes";
+import { resolveCommandFromPath } from "./routes";
+import { FallbackScreen } from "../Fallback/FallbackScreen";
 
-const FALLBACK_COMMAND: CommandName = "home";
+const FALLBACK: CommandName = "home";
 
 export function useNavigation() {
-  const [command, setCommand] = useState<CommandName>(FALLBACK_COMMAND);
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  // Resolve initial command from current URL
-  useEffect(() => {
-    const resolved = resolveCommandFromPath(window.location.pathname);
-    if (resolved) {
-      setCommand(resolved);
-    }
-  }, []);
+  const command: CommandName =
+    resolveCommandFromPath(location.pathname) ?? FALLBACK;
 
-  const navigate = (cmd: CommandName, payload?: CommandPayload) => {
-    const href = commandToPath(cmd, payload);
-    window.history.pushState({}, "", href);
-    setCommand(cmd);
-  };
+  const entry = commandRegistry[command];
 
-  // Compute component dynamically
-  const entry = commandRegistry[command] ?? commandRegistry[FALLBACK_COMMAND];
-  const Component = entry?.component ?? commandRegistry[FALLBACK_COMMAND].component;
+  let Component: React.ComponentType<any> = FallbackScreen;
+
+  try {
+    Component = lazy(entry.load);
+  } catch {
+    Component = FallbackScreen;
+  }
 
   return {
-    command: entry ? command : FALLBACK_COMMAND,
-    navigate,
+    command,
     Component,
+    navigate: (cmd: CommandName, params?: Record<string, string>) => {
+      const def = commandRegistry[cmd];
+      if (!def) return;
+      let path = def.path;
+      if (params) {
+        Object.entries(params).forEach(([key, val]) => {
+          path = path.replace(":" + key, val);
+        });
+      }
+      navigate(path);
+    },
   };
 }
