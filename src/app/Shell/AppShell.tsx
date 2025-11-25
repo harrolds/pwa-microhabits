@@ -1,32 +1,58 @@
-import BottomSheetHost from './BottomSheetHost'
-import Footer from './Footer'
-import Header from './Header'
-import LeftPanel from './LeftPanel'
-import OverlayHost from './OverlayHost'
-import RightPanel from './RightPanel'
-import ToastHost from './ToastHost'
+import React from 'react';
+import { Outlet } from 'react-router-dom';
 
-import AppRoutes from '@app/Navigation/AppRoutes'
+// Legacy shell components that remain valid
+import { Header } from './Header';
+import { Footer } from './Footer';
 
-export default function AppShell() {
+// New v3.0 subsystems (Batch-5)
+import { StickyHeader } from '@app/layout/sticky/StickyHeader';
+import { StickyFooter } from '@app/layout/sticky/StickyFooter';
+
+import { LeftPanelHost } from '@app/layout/panels/LeftPanelHost';
+import { RightPanelHost } from '@app/layout/panels/RightPanelHost';
+
+import { SheetHost } from '@app/layout/sheets/SheetHost';
+import { OverlayHost as BatchOverlayHost } from '@app/layout/overlays/OverlayHost';
+import { ToastHost as BatchToastHost } from '@app/layout/toasts/ToastHost';
+
+import { CommandPalette } from '@app/commands/palette/CommandPalette';
+
+// Global tokens
+import '@app/tokens/tokens.css';
+
+// Global layout styles for shell (optional if you use a shared stylesheet)
+import './AppShell.css';
+
+export const AppShell: React.FC = () => {
   return (
     <div className="app-shell">
-      <Header />
 
+      {/* Sticky Header (top) */}
+      <StickyHeader>
+        <Header />
+      </StickyHeader>
+
+      {/* Main Application Body */}
       <div className="app-shell__body">
-        <LeftPanel />
-        <main className="app-shell__content" role="main">
-          <AppRoutes />
-        </main>
-        <RightPanel />
+        <Outlet />
       </div>
 
-      <Footer />
+      {/* Sticky Footer (bottom) */}
+      <StickyFooter>
+        <Footer />
+      </StickyFooter>
 
-      <OverlayHost />
-      <ToastHost />
-      <BottomSheetHost />
+      {/* Global UI Hosts */}
+      <LeftPanelHost />
+      <RightPanelHost />
+
+      <SheetHost />
+      <BatchOverlayHost />
+      <BatchToastHost />
+
+      {/* Command Palette */}
+      <CommandPalette />
     </div>
-  )
-}
-
+  );
+};
