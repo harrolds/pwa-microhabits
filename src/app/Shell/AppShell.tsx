@@ -18,11 +18,15 @@ import { ToastHost as BatchToastHost } from '@app/layout/toasts/ToastHost';
 
 import { CommandPalette } from '@app/commands/palette/CommandPalette';
 
+// Debug layer
+import { DebugLayer } from '@debug/DebugLayer';
+
 // Global tokens
 import '@app/tokens/tokens.css';
 
-// Global layout styles for shell (optional if you use a shared stylesheet)
+// Global layout styles for shell
 import './AppShell.css';
+
 // Layout subsystem styles
 import '@app/layout/panels/panel.css';
 import '@app/layout/sheets/sheet.css';
@@ -59,6 +63,9 @@ export const AppShell: React.FC = () => {
 
       {/* Command Palette */}
       <CommandPalette />
+
+      {/* Debug Layer */} 
+      <DebugLayer />
     </div>
   );
 };
