@@ -37,6 +37,14 @@ export const AppShell: React.FC = () => {
   return (
     <div className="app-shell">
 
+      {/* === Portal Anchors MUST BE FIRST === */}
+      <div id="sticky-root"></div>
+      <div id="panel-root"></div>
+      <div id="sheet-root"></div>
+      <div id="overlay-root"></div>
+      <div id="toast-root"></div>
+      <div id="command-root"></div>
+
       {/* Sticky Header */}
       <StickyHeader>
         <Header />
@@ -64,14 +72,6 @@ export const AppShell: React.FC = () => {
 
       {/* Debug Layer */}
       <DebugLayer />
-
-      {/* === NEW: Portal Anchors === */}
-      <div id="sticky-root"></div>
-      <div id="panel-root"></div>
-      <div id="sheet-root"></div>
-      <div id="overlay-root"></div>
-      <div id="toast-root"></div>
-      <div id="command-root"></div>
     </div>
   );
 };
