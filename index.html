@@ -1,29 +1,40 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" href="/favicon.ico" sizes="any" />
-    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
-    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
-    <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#0f172a" />
-    <title>PWA Factory Skeleton v3.0</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>PWA Factory Skeleton v1</title>
   </head>
 
   <body>
-    <!-- React root -->
+
+    <!-- React mount -->
     <div id="root"></div>
 
-    <!-- PWA Factory Portal Anchors -->
+    <!-- Sticky subsystem -->
     <div id="sticky-root"></div>
-    <div id="panel-root"></div>
+
+    <!-- Panels (left & right) -->
+    <div id="panel-root-left"></div>
+    <div id="panel-root-right"></div>
+
+    <!-- Sheets -->
     <div id="sheet-root"></div>
+
+    <!-- Overlays -->
     <div id="overlay-root"></div>
+
+    <!-- Toasts -->
     <div id="toast-root"></div>
+
+    <!-- Command Palette -->
     <div id="command-root"></div>
 
-    <!-- React entrypoint -->
+    <!-- Vite entry -->
     <script type="module" src="/src/main.tsx"></script>
+
   </body>
 </html>
