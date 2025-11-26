@@ -18,7 +18,6 @@ import { ToastHost as BatchToastHost } from '@app/layout/toasts/ToastHost';
 
 import { CommandPalette } from '@app/commands/palette/CommandPalette';
 
-// Debug layer
 import { DebugLayer } from '../../debug/DebugLayer';
 
 // Global tokens
@@ -38,22 +37,22 @@ export const AppShell: React.FC = () => {
   return (
     <div className="app-shell">
 
-      {/* Sticky Header (top) */}
+      {/* Sticky Header */}
       <StickyHeader>
         <Header />
       </StickyHeader>
 
-      {/* Main Application Body */}
+      {/* Main Body */}
       <div className="app-shell__body">
         <Outlet />
       </div>
 
-      {/* Sticky Footer (bottom) */}
+      {/* Sticky Footer */}
       <StickyFooter>
         <Footer />
       </StickyFooter>
 
-      {/* Global UI Hosts */}
+      {/* Hosts */}
       <LeftPanelHost />
       <RightPanelHost />
 
@@ -61,11 +60,18 @@ export const AppShell: React.FC = () => {
       <BatchOverlayHost />
       <BatchToastHost />
 
-      {/* Command Palette */}
       <CommandPalette />
 
-      {/* Debug Layer */} 
+      {/* Debug Layer */}
       <DebugLayer />
+
+      {/* === NEW: Portal Anchors === */}
+      <div id="sticky-root"></div>
+      <div id="panel-root"></div>
+      <div id="sheet-root"></div>
+      <div id="overlay-root"></div>
+      <div id="toast-root"></div>
+      <div id="command-root"></div>
     </div>
   );
 };
