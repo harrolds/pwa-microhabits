@@ -1,11 +1,11 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 
-// Legacy shell components that remain valid
+// Legacy shell components
 import { Header } from './Header';
 import { Footer } from './Footer';
 
-// New v3.0 subsystems (Batch-5)
+// Layout subsystems
 import { StickyHeader } from '@app/layout/sticky/StickyHeader';
 import { StickyFooter } from '@app/layout/sticky/StickyFooter';
 
@@ -20,37 +20,26 @@ import { CommandPalette } from '@app/commands/palette/CommandPalette';
 
 import { DebugLayer } from '../../debug/DebugLayer';
 
-// Global tokens
+// Global tokens & CSS
 import '@app/tokens/tokens.css';
-
-// Global layout styles for shell
 import './AppShell.css';
-
-// Layout subsystem styles
 import '@app/layout/panels/panel.css';
 import '@app/layout/sheets/sheet.css';
 import '@app/layout/overlays/overlay.css';
 import '@app/layout/toasts/toast.css';
 import '@app/commands/palette/palette.css';
+import '@app/layout/sticky/sticky.css';
 
 export const AppShell: React.FC = () => {
   return (
     <div className="app-shell">
-
-      {/* === Portal Anchors MUST BE FIRST === */}
-      <div id="sticky-root"></div>
-      <div id="panel-root"></div>
-      <div id="sheet-root"></div>
-      <div id="overlay-root"></div>
-      <div id="toast-root"></div>
-      <div id="command-root"></div>
 
       {/* Sticky Header */}
       <StickyHeader>
         <Header />
       </StickyHeader>
 
-      {/* Main Body */}
+      {/* Main content */}
       <div className="app-shell__body">
         <Outlet />
       </div>
@@ -60,17 +49,15 @@ export const AppShell: React.FC = () => {
         <Footer />
       </StickyFooter>
 
-      {/* Hosts */}
+      {/* Global hosts */}
       <LeftPanelHost />
       <RightPanelHost />
-
       <SheetHost />
       <BatchOverlayHost />
       <BatchToastHost />
 
+      {/* Commands & Debug */}
       <CommandPalette />
-
-      {/* Debug Layer */}
       <DebugLayer />
     </div>
   );
