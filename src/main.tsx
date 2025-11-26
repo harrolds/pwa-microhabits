@@ -4,7 +4,7 @@ import { BrowserRouter } from 'react-router-dom'
 
 import { AppShell } from '@app/Shell/AppShell'
 import { loadModule } from '@app/modules/loader'
-import '@pwa/registerSW'
+// import '@pwa/registerSW'
 
 async function bootstrap() {
   await loadModule(() =>
