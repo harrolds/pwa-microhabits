@@ -1,7 +1,22 @@
-
 import React from 'react';
-import './sticky.css';
+import { createPortal } from 'react-dom';
 
-export const StickyHeader: React.FC = ({ children }) => (
-  <header className="sticky-header">{children}</header>
-);
+interface StickyHeaderProps {
+  children: React.ReactNode;
+}
+
+export const StickyHeader: React.FC<StickyHeaderProps> = ({ children }) => {
+  const root = document.getElementById('sticky-root');
+
+  if (!root) {
+    console.warn('[StickyHeader] #sticky-root not found');
+    return null;
+  }
+
+  return createPortal(
+    <header className="sticky-header">
+      {children}
+    </header>,
+    root
+  );
+};
